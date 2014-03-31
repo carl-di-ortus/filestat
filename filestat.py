@@ -34,19 +34,21 @@ def get_file_list(directory):
 def calc_file_stats(filename):
     """Calculates file statistics and returns two dictionaries
         with words and chars usage."""
+    # TODO: sort dicts (by count or by abc)
     
     words = {}
     chars = {}
     
     f = open(filename)
     
-    for line in f.readline():
+    for line in f.readlines():
         for char in line:
             if not char in chars.keys():
                 chars[char] = 1
             else:
                 chars[char] += 1
-        for word in re.split(' .,<>?/;:\'"[]{}\\\|=+-_)(*&^%$#@!~`\n', line):
+        # TODO: other separators & is it necessary
+        for word in line.split(' '):
             if not word in words.keys():
                 words[word] = 1
             else:
