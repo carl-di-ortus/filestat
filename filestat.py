@@ -49,6 +49,7 @@ def calc_file_stats(filename):
     """Calculates file statistics and returns two dictionaries
         with words and chars usage."""
     # TODO: sort dicts (by count or by abc)
+    # TODO: not possible, must convert to list or tuple!
     
     words = {}
     chars = {}
@@ -87,8 +88,15 @@ def dictadd(dict1, dict2):
     return result
 
 
-def write_stats(words, chars, filehandle):
+def write_stats(words, chars, filehandle, context):
     """Writes the dictionaries to a file."""
+    
+    filehandle.write('\n'+context+'\n\nWords usage:\n')
+    for key in words:
+        filehandle.write('\"'+key+'\": %d\n' % words[key])
+    filehandle.write('\nChars usage:\n')
+    for key in chars:
+        filehandle.write('\"'+key+'\": %d\n' % chars[key])
     
     return
 
@@ -99,8 +107,9 @@ totalwords = {}
 totalchars = {}
 for f in filelist:
     words, chars = calc_file_stats(f)
-    write_stats(words, chars, handle)
+    write_stats(words, chars, handle, f)
     totalwords = dictadd(totalwords, words)
     totalchars = dictadd(totalchars, chars)
 handle.seek(0)
-write_stats(totalwords, totalchars, handle)
+write_stats(totalwords, totalchars, handle, "TOTAL")
+handle.close()
