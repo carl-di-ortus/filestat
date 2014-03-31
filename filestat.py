@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 
-"""Recursively reading files in a directory and calculating its statistics."""
+"""Recursively read files in a directory and calculate its statistics."""
 
 # Scripted by Carl di Ortus | reklamukibiras@gmail.com
 # Available in MIT license (see LICENCE)
@@ -10,19 +10,6 @@ import argparse
 import copy
 import mimetypes
 import os
-
-
-parser = argparse.ArgumentParser(description="""
-    Recursively reading files in a directory and calculating its statistics.
-    Statistics are written to a provided filename.
-    (Always overwritten if file is present)""")
-parser.add_argument('-f', metavar='<filename>', type=str,
-                    help='location to save the statistics')
-parser.add_argument('-d', metavar='<dir>', type=str,
-                    help='root directory for recursive file search')
-
-
-args = parser.parse_args()
 
 
 def get_file_list(directory):
@@ -57,6 +44,7 @@ def calc_file_stats(filename):
     f = open(filename)
     
     for line in f.readlines():
+        line = line.strip()
         for char in line:
             if not char in chars.keys():
                 chars[char] = 1
@@ -79,8 +67,8 @@ def dictadd(dict1, dict2):
     
     result = copy.deepcopy(dict1)
     
-    for key in result.keys():
-        if key in dict2.keys():
+    for key in dict2.keys():
+        if key in result.keys():
             result[key] += dict2[key]
         else:
             result[key] = dict2[key]
@@ -101,15 +89,31 @@ def write_stats(words, chars, filehandle, context):
     return
 
 
-filelist = get_file_list(args.d)
-handle = open(args.f, 'w')
-totalwords = {}
-totalchars = {}
-for f in filelist:
-    words, chars = calc_file_stats(f)
-    write_stats(words, chars, handle, f)
-    totalwords = dictadd(totalwords, words)
-    totalchars = dictadd(totalchars, chars)
-handle.seek(0)
-write_stats(totalwords, totalchars, handle, "TOTAL")
-handle.close()
+def main():
+    parser = argparse.ArgumentParser(description="""
+        Recursively read files in a directory and calculate its statistics.
+        Statistics are written to a provided filename.
+        (Always overwritten if file is present)""")
+    parser.add_argument('filename', metavar='<filename>', type=str,
+                        help='location to save the statistics')
+    parser.add_argument('directory', metavar='<dir>', type=str,
+                        help='root directory for recursive file search')
+    args = parser.parse_args()
+    
+    filelist = get_file_list(args.directory)
+    handle = open(args.filename, 'w+')
+    totalwords = {}
+    totalchars = {}
+    for f in filelist:
+        words, chars = calc_file_stats(f)
+        write_stats(words, chars, handle, f)
+        totalwords = dictadd(totalwords, words)
+        totalchars = dictadd(totalchars, chars)
+    handle.seek(0, 0)
+    write_stats(totalwords, totalchars, handle, "TOTAL")
+    handle.close()
+    return
+
+
+if __name__ == '__main__':
+    main()
