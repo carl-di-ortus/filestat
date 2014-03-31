@@ -10,6 +10,7 @@ import argparse
 import copy
 import mimetypes
 import os
+import tempfile
 
 
 def get_file_list(directory):
@@ -79,12 +80,12 @@ def dictadd(dict1, dict2):
 def write_stats(words, chars, filehandle, context):
     """Writes the dictionaries to a file."""
     
-    filehandle.write('\n'+context+'\n\nWords usage:\n')
+    filehandle.write(bytes('\n'+context+'\n\nWords usage:\n', 'UTF-8'))
     for key in words:
-        filehandle.write('\"'+key+'\": %d\n' % words[key])
-    filehandle.write('\nChars usage:\n')
+        filehandle.write(bytes('\"'+key+'\": %d\n' % words[key], 'UTF-8'))
+    filehandle.write(bytes('\nChars usage:\n', 'UTF-8'))
     for key in chars:
-        filehandle.write('\"'+key+'\": %d\n' % chars[key])
+        filehandle.write(bytes('\"'+key+'\": %d\n' % chars[key], 'UTF-8'))
     
     return
 
@@ -101,17 +102,28 @@ def main():
     args = parser.parse_args()
     
     filelist = get_file_list(args.directory)
-    handle = open(args.filename, 'w+')
+    tmp = tempfile.TemporaryFile()
     totalwords = {}
     totalchars = {}
+    
     for f in filelist:
         words, chars = calc_file_stats(f)
-        write_stats(words, chars, handle, f)
+        write_stats(words, chars, tmp, f)
         totalwords = dictadd(totalwords, words)
         totalchars = dictadd(totalchars, chars)
-    handle.seek(0, 0)
+    
+    handle = open(args.filename, 'wb')
     write_stats(totalwords, totalchars, handle, "TOTAL")
+    tmp.seek(0, 0)
+    for line in tmp.readlines():
+        handle.write(line)
+    
+    tmp.close
     handle.close()
+    
+    print('%d files treated\n' % len(filelist))
+    print('%d total different words\n' % len(totalwords))
+    print('%d total different chars\n' % len(totalchars))
     return
 
 
