@@ -1,14 +1,28 @@
 #! /usr/bin/python3
 
-"""Recursive reads of files in a directory and calculates their statistics."""
+"""Recursively reading files in a directory and calculating its statistics."""
 
 # Scripted by Carl di Ortus | reklamukibiras@gmail.com
 # Available in MIT license (see LICENCE)
 
 
+import argparse
 import copy
 import mimetypes
 import os
+
+
+parser = argparse.ArgumentParser(description="""
+    Recursively reading files in a directory and calculating its statistics.
+    Statistics are written to a provided filename.
+    (Always overwritten if file is present)""")
+parser.add_argument('-f', metavar='<filename>', type=str,
+                    help='location to save the statistics')
+parser.add_argument('-d', metavar='<dir>', type=str,
+                    help='root directory for recursive file search')
+
+
+args = parser.parse_args()
 
 
 def get_file_list(directory):
