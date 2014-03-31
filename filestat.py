@@ -6,9 +6,9 @@
 # Available in MIT license (see LICENCE)
 
 
+import copy
 import mimetypes
 import os
-import re
 
 
 def get_file_list(directory):
@@ -56,4 +56,19 @@ def calc_file_stats(filename):
     
     f.close()
     return words, chars
+
+
+def dictadd(dict1, dict2):
+    """Adds two dictionaries like in set algebra.
+        Returns new dictionary."""
+    
+    result = copy.deepcopy(dict1)
+    
+    for key in result.keys():
+        if key in dict2.keys():
+            result[key] += dict2[key]
+        else:
+            result[key] = dict2[key]
+    
+    return result
 
