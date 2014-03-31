@@ -8,6 +8,7 @@
 
 import mimetypes
 import os
+import re
 
 
 def get_file_list(directory):
@@ -29,4 +30,28 @@ def get_file_list(directory):
     
     return filelist
 
+
+def calc_file_stats(filename):
+    """Calculates file statistics and returns two dictionaries
+        with words and chars usage."""
+    
+    words = {}
+    chars = {}
+    
+    f = open(filename)
+    
+    for line in f.readline():
+        for char in line:
+            if not char in chars.keys():
+                chars[char] = 1
+            else:
+                chars[char] += 1
+        for word in re.split(' .,<>?/;:\'"[]{}\\\|=+-_)(*&^%$#@!~`\n', line):
+            if not word in words.keys():
+                words[word] = 1
+            else:
+                words[word] += 1
+    
+    f.close()
+    return words, chars
 
