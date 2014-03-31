@@ -86,3 +86,21 @@ def dictadd(dict1, dict2):
     
     return result
 
+
+def write_stats(words, chars, filehandle):
+    """Writes the dictionaries to a file."""
+    
+    return
+
+
+filelist = get_file_list(args.d)
+handle = open(args.f, 'w')
+totalwords = {}
+totalchars = {}
+for f in filelist:
+    words, chars = calc_file_stats(f)
+    write_stats(words, chars, handle)
+    totalwords = dictadd(totalwords, words)
+    totalchars = dictadd(totalchars, chars)
+handle.seek(0)
+write_stats(totalwords, totalchars, handle)
